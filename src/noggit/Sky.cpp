@@ -471,8 +471,13 @@ void Skies::loadZoneLights(int map_id)
 {
     // read zone lights from csv file
   {
+#ifdef _WIN32  // Windows
     std::string zonelight_db_path = Noggit::Application::NoggitApplication::instance()->getConfiguration()->ApplicationNoggitDefinitionsPath
       + "\\ZoneLight.3.4.3.56262.csv";
+#else
+    std::string zonelight_db_path = Noggit::Application::NoggitApplication::instance()->getConfiguration()->ApplicationNoggitDefinitionsPath
+      + "/ZoneLight.3.4.3.56262.csv";
+#endif
     QString qPath = QString::fromStdString(zonelight_db_path);
     QFile file(qPath);
 
@@ -534,8 +539,13 @@ void Skies::loadZoneLights(int map_id)
   // load zone light points to temporary object
   std::unordered_map<int, std::vector<ZoneLightPoint>> zoneLightPoints;
   {
+#ifdef _WIN32  // Windows
     std::string zonelightpoints_db_path = Noggit::Application::NoggitApplication::instance()->getConfiguration()->ApplicationNoggitDefinitionsPath
       + "\\ZoneLightPoint.3.4.3.56262.csv";
+#else
+    std::string zonelightpoints_db_path = Noggit::Application::NoggitApplication::instance()->getConfiguration()->ApplicationNoggitDefinitionsPath
+      + "/ZoneLightPoint.3.4.3.56262.csv";
+#endif
     QString qPath = QString::fromStdString(zonelightpoints_db_path);
     QFile file(qPath);
 

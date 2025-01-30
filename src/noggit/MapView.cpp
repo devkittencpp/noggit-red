@@ -127,7 +127,7 @@
 #include <vector>
 #include <random>
 #include <format>
-
+#include <stdexcept>  // Include for std::runtime_error
 
 /* Some ugly macros we use */
 // TODO: make those methods instead???
@@ -806,7 +806,7 @@ void MapView::activeTool(editing_mode newTool)
         }
     }
 
-    throw std::exception{ std::format("Tried to call MapView::activeTool with invalid editing_mode `{}`!", static_cast<int>(newTool)).c_str() };
+    throw std::runtime_error(std::format("Tried to call MapView::activeTool with invalid editing_mode `{}`!", static_cast<int>(newTool)));
 }
 
 Noggit::Ui::Tools::ViewToolbar::Ui::ViewToolbar* MapView::getLeftSecondaryViewToolbar()
@@ -3612,7 +3612,7 @@ void MapView::draw_map()
   renderParams.use_ref_pos = use_ref_pos;
   renderParams.angled_mode = angled_mode;
   renderParams.draw_paintability_overlay = terrainMode == editing_mode::paint;
-  renderParams.editing_mode = terrainMode;
+  renderParams.m_editing_mode = terrainMode;
   renderParams.camera_moved = debug_cam ? false : _camera_moved_since_last_draw;
   renderParams.draw_mfbo = _draw_mfbo.get();
   renderParams.draw_terrain = _draw_terrain.get();
@@ -3628,7 +3628,7 @@ void MapView::draw_map()
   renderParams.draw_fog = _draw_fog.get();
   renderParams.ground_editing_brush = terrainType;
   renderParams.water_layer = displayed_water_layer;
-  renderParams.display_mode = _display_mode;
+  renderParams.m_display_mode = _display_mode;
   renderParams.draw_occlusion_boxes = _draw_occlusion_boxes.get();
   renderParams.minimap_render = false;
   renderParams.draw_wmo_exterior = _draw_wmo_exterior.get();

@@ -12,19 +12,19 @@
 
 #include <QDialog>
 #include <QMessageBox>
-#include <QtWidgets/QCheckBox.h>
-#include <QtWidgets/QComboBox.h>
+#include <QtWidgets/qcheckbox.h>
+#include <QtWidgets/qcombobox.h>
 #include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QFormLayout>
 #include <QtWidgets/qgroupbox.h>
-#include <QtWidgets/QLabel.h>
+#include <QtWidgets/qlabel.h>
 #include <QtWidgets/qlineedit.h>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSlider>
-#include <QtWidgets/QSpinBox.h>
+#include <QtWidgets/qspinbox.h>
 #include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QVBoxLayout>
-
+#include <cmath>  // For std::round
 #include <bitset>
 #include <iostream>
 #include <sstream>

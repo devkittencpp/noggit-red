@@ -113,9 +113,9 @@ WMOInstance& WMOInstance::operator= (WMOInstance&& other) noexcept
 }
 
 void WMOInstance::draw ( OpenGL::Scoped::use_program& wmo_shader
-                       , const glm::mat4x4 const& model_view
-                       , const glm::mat4x4 const& projection
-                       , math::frustum const& frustum
+                       , const glm::mat4x4& model_view
+                       , const glm::mat4x4& projection
+                       , const math::frustum& frustum
                        , const float& cull_distance
                        , const glm::vec3& camera
                        , bool force_box

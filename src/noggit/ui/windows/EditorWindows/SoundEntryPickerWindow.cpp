@@ -9,8 +9,8 @@
 #include <QtWidgets/qgroupbox.h>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QCheckBox.h>
-#include <QtWidgets/QComboBox.h>
+#include <QtWidgets/qcheckbox.h>
+#include <QtWidgets/qcombobox.h>
 #include <QtWidgets/qlineedit.h>
 #include <QSpinBox>
 #include <QListWidget>

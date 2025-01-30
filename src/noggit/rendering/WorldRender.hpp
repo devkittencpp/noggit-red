@@ -42,7 +42,7 @@ struct WorldRenderParams
   bool use_ref_pos;
   bool angled_mode;
   bool draw_paintability_overlay;
-  editing_mode editing_mode;
+  editing_mode m_editing_mode;
   bool camera_moved;
   bool draw_mfbo;
   bool draw_terrain;
@@ -58,7 +58,7 @@ struct WorldRenderParams
   bool draw_fog;
   eTerrainType ground_editing_brush;
   int water_layer;
-  display_mode display_mode;
+  display_mode m_display_mode;
   bool draw_occlusion_boxes;
   bool minimap_render;
   bool draw_wmo_exterior;

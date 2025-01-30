@@ -29,6 +29,7 @@
 #include <format>
 #include <fstream>
 #include <vector>
+#include <stdexcept>  // Required for std::runtime_error
 
 namespace Noggit::Ui::Tools
 {
@@ -170,13 +171,18 @@ namespace Noggit::Ui::Tools
 
   void AreaTriggerEditor::save()
   {
+#ifdef _WIN32  // Windows
     auto const file_path = Noggit::Application::NoggitApplication::instance()->getConfiguration()->ApplicationNoggitDefinitionsPath
       + "\\AreatriggerDescriptions.csv";
+#else
+    auto const file_path = Noggit::Application::NoggitApplication::instance()->getConfiguration()->ApplicationNoggitDefinitionsPath
+      + "/AreatriggerDescriptions.csv";
+#endif
 
     std::ofstream file{ file_path, std::ios_base::out };
     if (!file)
     {
-      throw std::exception{ std::format("Could not open file {}!", file_path).c_str() };
+      throw std::runtime_error(std::format("Could not open file {}!", file_path));
     }
 
     file << "ID,Zone Name,Sub Category,Trigger Name,IsBuiltIn,\n";
@@ -191,21 +197,25 @@ namespace Noggit::Ui::Tools
   {
     constexpr int expected_num_tokens = 6;
     char const* expeceted_header = "ID,Zone Name,Sub Category,Trigger Name,IsBuiltIn,";
-
+#ifdef _WIN32  // Windows
     auto const file_path = Noggit::Application::NoggitApplication::instance()->getConfiguration()->ApplicationNoggitDefinitionsPath
       + "\\AreatriggerDescriptions.csv";
+#else
+    auto const file_path = Noggit::Application::NoggitApplication::instance()->getConfiguration()->ApplicationNoggitDefinitionsPath
+      + "/AreatriggerDescriptions.csv";
+#endif
 
     QFile file{ QString::fromStdString(file_path) };
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-      throw std::exception{ std::format("Could not open file {}!", file_path).c_str() };
+      throw std::runtime_error(std::format("Could not open file {}!", file_path));
     }
 
     QTextStream stream{ &file };
     if (auto header = stream.readLine(); header != expeceted_header)
     {
       auto foo = header.toStdString();
-      throw std::exception{ std::format("File {} uses invalid header `{}`!", file_path, header.toStdString()).c_str() };
+      throw std::runtime_error(std::format("File {} uses invalid header `{}`!", file_path, header.toStdString()));
     }
 
     int line = 1;

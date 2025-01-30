@@ -11,6 +11,13 @@ CMAKE_POLICY(SET CMP0057 NEW) # "Support new IN_LIST if() operator."
 SET(CMAKE_CXX_STANDARD 20)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS 1)
+
+if (UNIX)
+SET(_lua_debug_lib "/usr/lib/x86_64-linux-gnu/liblua5.4.a")
+SET(_lua_release_lib "/usr/lib/x86_64-linux-gnu/liblua5.4.so")
+endif()
+
 #Including cmake dependencies
 INCLUDE(CheckCXXCompilerFlag)
 INCLUDE(cmake/cmake_function.cmake)
@@ -22,44 +29,41 @@ INCLUDE(FetchContent)
 #Project name
 PROJECT(Noggit)
 
-#Covered by CMAKE_CXX_STANDARD
-add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-c++98-compat)
-add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-c++98-compat-pedantic)
-#Covered by compilers used
-add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-gnu-anonymous-struct)
-add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-variadic-macros)
-add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-vla)
-add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-vla-extension)
-add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-zero-length-array)
-add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-gnu-zero-variadic-macro-arguments)
-add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-nested-anon-types)
-add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-four-char-constants)
-#We assume that our constructors and destructors do not access other global state
-add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-exit-time-destructors)
-add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-global-constructors)
-#Is fine with GNU, required due to our libstdc
-add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-disabled-macro-expansion)
-#We can live with the compilation unit containing the vtable not being fixed
-add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-weak-vtables)
-add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-weak-template-vtables)
-# __DATE__ and __TIME__ not being reproducible is exactly why they exist.
-add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-date-time)
-#We don't care for a few bytes
-add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-padded)
-#Msvc++ mangles struct/class into name, thus symbols may be called differently
-#With a bad forward-decl. we want compilation to fail, not linking.
-add_compiler_flag_if_supported(CMAKE_CXX_FLAGS /we4099)
-add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Werror=mismatched-tags)
-#Yes, we intend to use multi-character character constants
-add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-multichar)
-#Better exception handling for visual studio, particularly for the asynchronous stuff
-add_compiler_flag_if_supported(CMAKE_CXX_FLAGS /EHa)
-#Multi core building for visual studio
-add_compiler_flag_if_supported(CMAKE_CXX_FLAGS /MP)
-#Allow Big obj for msvc compilation
-add_compiler_flag_if_supported(CMAKE_CXX_FLAGS /bigobj)
+# Check for MSVC and other compilers
+if(MSVC)
+    # MSVC specific flags
+    add_compiler_flag_if_supported(CMAKE_CXX_FLAGS /we4099)                # Suppress warnings for bad forward declarations
+    add_compiler_flag_if_supported(CMAKE_CXX_FLAGS /we4099)                # Suppress warnings for mismatched tags
+    add_compiler_flag_if_supported(CMAKE_CXX_FLAGS /EHa)                   # Better exception handling for MSVC
+    add_compiler_flag_if_supported(CMAKE_CXX_FLAGS /MP)                    # Enable multi-core building for MSVC
+    add_compiler_flag_if_supported(CMAKE_CXX_FLAGS /bigobj)                # Allow big object compilation for MSVC
 
-add_compiler_flag_if_supported (CMAKE_C_FLAGS -Wno-implicit-function-declaration)
+else()
+    # GCC/Clang specific flags
+    add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-c++98-compat)
+    add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-c++98-compat-pedantic)
+    add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-gnu-anonymous-struct)
+    add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-variadic-macros)
+    add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-vla)
+    add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-vla-extension)
+    add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-zero-length-array)
+    add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-gnu-zero-variadic-macro-arguments)
+    add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-nested-anon-types)
+    add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-four-char-constants)
+    add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-exit-time-destructors)
+    add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-global-constructors)
+    add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-disabled-macro-expansion)
+    add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-weak-vtables)
+    add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-weak-template-vtables)
+    add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-date-time)
+    add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-padded)
+    add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Wno-multichar)
+    add_compiler_flag_if_supported(CMAKE_CXX_FLAGS -Werror=mismatched-tags)
+endif()
+
+if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-implicit-function-declaration")
+endif()
 
 IF(WIN32)
   OPTION(NAME_REUSE_AS_ERROR "Make name reuse warnings errors ?" OFF)
@@ -332,8 +336,6 @@ if (UNIX)
   ELSE()
     MESSAGE("-- Bzip2 found.")
   ENDIF()
-
-  TARGET_LINK_LIBRARIES (noggit ${BZIP2_LIBRARIES})
 ENDIF()
 
 
@@ -363,6 +365,13 @@ TARGET_LINK_LIBRARIES (noggit
   blizzard-database-library
   rapidfuzz::rapidfuzz
 )
+
+if (UNIX)
+TARGET_LINK_LIBRARIES (noggit
+  /usr/local/lib/libstorm.a
+  -lbz2
+)
+ENDIF()
 
 #add distribution themes
 add_custom_command(TARGET noggit POST_BUILD
@@ -522,3 +531,10 @@ if(${FAST_BUILD_NOGGIT_JUMBO})
   set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/src/external/imguizmo/ImSequencer.cpp" PROPERTIES SKIP_UNITY_BUILD_INCLUSION TRUE)
   set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/src/noggit/rendering/WorldRender.cpp" PROPERTIES SKIP_UNITY_BUILD_INCLUSION TRUE)
 endif()
+
+# Define source and destination paths
+set(SCRIPTS_SOURCE_DIR "${CMAKE_SOURCE_DIR}/scripts")
+set(SCRIPTS_DEST_DIR "${CMAKE_BINARY_DIR}/bin")
+
+# Move the scripts folder and its contents
+file(COPY ${SCRIPTS_SOURCE_DIR} DESTINATION ${SCRIPTS_DEST_DIR} FILES_MATCHING PATTERN "*")

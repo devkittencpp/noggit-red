@@ -1,6 +1,7 @@
 #ifndef NOGGIT_WINDOW_NOGGIT_HPP
 #define NOGGIT_WINDOW_NOGGIT_HPP
 
+#include <noggit/ui/windows/noggitWindow/components/BuildMapListComponent.hpp>
 #include <noggit/ui/uid_fix_mode.hpp>
 
 #include <math/trig.hpp>

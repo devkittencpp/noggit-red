@@ -11,7 +11,7 @@
 #include <typeinfo>
 #include <variant>
 #include <vector>
-
+#include <algorithm>  // Required for std::max_element
 
 namespace util
 {

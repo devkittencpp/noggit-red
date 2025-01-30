@@ -11,7 +11,7 @@
 #include <QListWidget>
 #include <QMediaPlayer>
 #include <QMessageBox>
-#include <qtemporaryfile>
+#include <QTemporaryFile>
 #include <QToolButton>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QSlider>

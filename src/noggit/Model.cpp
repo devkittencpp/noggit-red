@@ -15,6 +15,7 @@
 #include <glm/gtx/quaternion.hpp>
 #include <map>
 #include <string>
+#include <cstring>  // Required for memcpy
 
 Model::Model(const std::string& filename, Noggit::NoggitRenderContext context)
   : AsyncObject(filename)

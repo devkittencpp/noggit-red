@@ -530,10 +530,11 @@ namespace Noggit
             {
                 // Same formula as in the shader.
                 float partr, partg, partb;
+                double partg_double, partr_double, partb_double;  // Use double for modf
                 // TODO : Can use id instead of count?
-                float r = modf(sin(glm::dot(glm::vec2(color_count), glm::vec2(12.9898, 78.233))) * 43758.5453, &partr);
-                float g = modf(sin(glm::dot(glm::vec2(color_count), glm::vec2(11.5591, 70.233))) * 43569.5451, &partg);
-                float b = modf(sin(glm::dot(glm::vec2(color_count), glm::vec2(13.1234, 76.234))) * 43765.5452, &partg);
+                float r = modf(sin(glm::dot(glm::vec2(color_count), glm::vec2(12.9898, 78.233))) * 43758.5453, &partr_double);
+                float g = modf(sin(glm::dot(glm::vec2(color_count), glm::vec2(11.5591, 70.233))) * 43569.5451, &partg_double);
+                float b = modf(sin(glm::dot(glm::vec2(color_count), glm::vec2(13.1234, 76.234))) * 43765.5452, &partb_double);
                 color_count++;
                 _effects_colors.push_back(glm::vec3(r, g, b));
             }

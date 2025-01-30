@@ -68,7 +68,7 @@ void WorldRender::draw (glm::mat4x4 const& model_view
   {
     int daytime = static_cast<int>(_world->time) % 2880;
     // always render local lights in sky/lightning editing mode.
-    bool render_local_lightning = render_settings.editing_mode == editing_mode::light ? true : local_lightning;
+    bool render_local_lightning = render_settings.m_editing_mode == editing_mode::light ? true : local_lightning;
     _skies->update_sky_colors(camera_pos, daytime, !render_local_lightning);
     updateLightingUniformBlock(render_settings.draw_fog, camera_pos);
   }
@@ -192,7 +192,7 @@ void WorldRender::draw (glm::mat4x4 const& model_view
             });
 
   // only draw the sky in 3D
-  if(!render_settings.minimap_render && render_settings.display_mode == display_mode::in_3D && render_settings.draw_sky)
+  if(!render_settings.minimap_render && render_settings.m_display_mode == display_mode::in_3D && render_settings.draw_sky)
   {
     ZoneScopedN("World::draw() : Draw skies");
     OpenGL::Scoped::use_program m2_shader {*_m2_program.get()};
@@ -257,7 +257,7 @@ void WorldRender::draw (glm::mat4x4 const& model_view
       _cull_distance,
       frustum,
       camera_pos,
-      render_settings.display_mode);
+      render_settings.m_display_mode);
   }
 
   gl.enable(GL_DEPTH_TEST);
@@ -331,7 +331,7 @@ void WorldRender::draw (glm::mat4x4 const& model_view
             , camera_pos
             , render_settings.show_unpaintable_chunks
             , render_settings.draw_paintability_overlay
-            , render_settings.editing_mode == editing_mode::minimap
+            , render_settings.m_editing_mode == editing_mode::minimap
               && minimap_render_settings->selected_tiles.at(64 * tile->index.x + tile->index.z)
             , skip_updates
         );
@@ -351,7 +351,7 @@ void WorldRender::draw (glm::mat4x4 const& model_view
     }
   }
 
-  if (render_settings.editing_mode == editing_mode::object && _world->has_multiple_model_selected())
+  if (render_settings.m_editing_mode == editing_mode::object && _world->has_multiple_model_selected())
   {
     ZoneScopedN("World::draw() : Draw pivot point");
     if (_world->_multi_select_pivot.has_value())
@@ -373,7 +373,7 @@ void WorldRender::draw (glm::mat4x4 const& model_view
     _sphere_render.draw(mvp, ref_pos, cursor_color, 0.3f);
   }
 
-  if (render_settings.editing_mode == editing_mode::ground && render_settings.ground_editing_brush == eTerrainType_Vertex)
+  if (render_settings.m_editing_mode == editing_mode::ground && render_settings.ground_editing_brush == eTerrainType_Vertex)
   {
     ZoneScopedN("World::draw() : Draw vertex points");
     float size = glm::distance(_world->vertexCenter(), camera_pos);
@@ -487,7 +487,7 @@ void WorldRender::draw (glm::mat4x4 const& model_view
               render = true; // skip frustum check
             }
           }
-          if (!render && m2_instance->isInRenderDist(_cull_distance, camera_pos, render_settings.display_mode)
+          if (!render && m2_instance->isInRenderDist(_cull_distance, camera_pos, render_settings.m_display_mode)
             && (tile->renderer()->objectsFrustumCullTest() > 1 || m2_instance->isInFrustum(frustum)))
           {
             render = true;
@@ -607,7 +607,7 @@ void WorldRender::draw (glm::mat4x4 const& model_view
                     // apply size culling to wmo doodads?
                     float dist = glm::distance(camera_pos, doodad.world_pos) - (doodad.model->bounding_box_radius * doodad.scale);
 
-                    if (!doodad.isInRenderDist(_cull_distance, camera_pos, render_settings.display_mode))
+                    if (!doodad.isInRenderDist(_cull_distance, camera_pos, render_settings.m_display_mode))
                       continue;
                     // TODO can check if in indoor group & exterior not hidden for further optimization. possibly check portals relations
               
@@ -707,7 +707,7 @@ void WorldRender::draw (glm::mat4x4 const& model_view
               , is_selected
               , _world->animtime
               , _skies->hasSkies()
-              , render_settings.display_mode
+              , render_settings.m_display_mode
               , disable_cull
               , render_settings.draw_wmo_exterior
               , render_settings.render_select_wmo_aabb
@@ -861,17 +861,17 @@ void WorldRender::draw (glm::mat4x4 const& model_view
                 , _world->animtime
                 , render_settings.draw_models_with_box
                 , model_boxes_to_draw
-                , render_settings.display_mode
+                , render_settings.m_display_mode
                 , false
                 , render_settings.draw_model_animations
-                , render_settings.editing_mode == editing_mode::object
+                , render_settings.m_editing_mode == editing_mode::object
                 , draw_animated_boxes
             );
             _world->_n_rendered_objects += pair.second.size();
           }
 
           // Draw animated bounding boxes for small animated models that move
-          if (/*render_settings.editing_mode == editing_mode::object*/
+          if (/*render_settings.m_editing_mode == editing_mode::object*/
             (render_settings.draw_models_with_box || pair.first->is_hidden()) // same condition to draw bounding box in draw()
             /*&& render_settings.draw_model_animations*/
             && pair.first->animated_mesh()  && pair.first->mesh_bounds_ratio < 0.5f)
@@ -1086,7 +1086,7 @@ void WorldRender::draw (glm::mat4x4 const& model_view
 
     float radius = 1.2f * render_settings.brush_radius;
 
-    if (render_settings.angled_mode && render_settings.editing_mode == editing_mode::flatten_blur)
+    if (render_settings.angled_mode && render_settings.m_editing_mode == editing_mode::flatten_blur)
     {
       if (render_settings.angle > 49.0f) // 0.855 radian
       {
@@ -1158,7 +1158,7 @@ void WorldRender::draw (glm::mat4x4 const& model_view
           , water_shader
           , _world->animtime
           , render_settings.water_layer
-          , render_settings.display_mode
+          , render_settings.m_display_mode
           , &_liquid_texture_manager
       );
     }
@@ -1186,7 +1186,7 @@ void WorldRender::draw (glm::mat4x4 const& model_view
     }
   }
 
-  if (render_settings.editing_mode == editing_mode::light && render_settings.alpha_light_sphere > 0.0f)
+  if (render_settings.m_editing_mode == editing_mode::light && render_settings.alpha_light_sphere > 0.0f)
   {
     // Sky* CurrentSky = skies()->findClosestSkyByDistance(camera_pos);
     // Sky* CurrentSky = skies()->findClosestSkyByWeight();
@@ -1934,7 +1934,7 @@ void WorldRender::drawMinimap ( MapTile *tile
   renderParams.use_ref_pos = 0.0f;
   renderParams.angled_mode = 0.0f;
   renderParams.draw_paintability_overlay = false;
-  renderParams.editing_mode = editing_mode::minimap;
+  renderParams.m_editing_mode = editing_mode::minimap;
   renderParams.camera_moved = true;
   renderParams.draw_mfbo = false;
   renderParams.draw_terrain = true;
@@ -1950,7 +1950,7 @@ void WorldRender::drawMinimap ( MapTile *tile
   renderParams.draw_fog = false;
   renderParams.ground_editing_brush = eTerrainType::eTerrainType_Linear;
   renderParams.water_layer = 0;
-  renderParams.display_mode = display_mode::in_3D;
+  renderParams.m_display_mode = display_mode::in_3D;
   renderParams.draw_occlusion_boxes = false;
   renderParams.minimap_render = true;
   renderParams.draw_wmo_exterior = true;

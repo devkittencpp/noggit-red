@@ -10,6 +10,7 @@
 #include <QMenu>
 #include <QObject>
 #include <QWidgetAction>
+#include <stdexcept>  // Required for std::runtime_error
 
 namespace Noggit
 {
@@ -150,7 +151,7 @@ namespace Noggit
             // If you get here and you're sure the name you're using isn't already used by this tool,
             // then you may have run into a hash collision and we need to re-evaluate the hashing algorithm.
             // Or, just change the name and move on...
-            throw std::exception{ "There's already a hotkey with this name!" };
+            throw std::runtime_error("There's already a hotkey with this name!");
         }
 
         _hotkeys[name] = hotkey;
