@@ -1,9 +1,11 @@
 [submodule "src/external/blizzard-database-library"]
 	path = src/external/blizzard-database-library
 	url = https://github.com/devkittencpp/Blizzard-Database-Library.git
+	branch = main
 [submodule "src/external/blizzard-archive-library"]
 	path = src/external/blizzard-archive-library
 	url = https://github.com/devkittencpp/Blizzard-Archive-Library.git
+	branch = main
 [submodule "cmake"]
 	path = cmake
 	url = https://github.com/devkittencpp/Build-Dependencies.git
