@@ -95,34 +95,153 @@ directory containing noggit.exe, i.e. `CMAKE_INSTALL_PREFIX` configured.
 * debug: Qt5Cored, Qt5OpenGLd, Qt5Widgetsd, Qt5Guid 
 
 ## Linux ##
-On **Ubuntu** you can install the building requirements using:
+On **Ubuntu/Pop!_OS** you can install the building requirements using:
 
 ```bash
-sudo apt install freeglut3-dev libboost-all-dev qt5-default libstorm-dev
+#!/bin/bash
+
+# Check current GCC and G++ versions
+current_gcc=$(gcc -dumpversion 2>/dev/null)
+current_gpp=$(g++ -dumpversion 2>/dev/null)
+
+echo "Current GCC version: $current_gcc"
+echo "Current G++ version: $current_gpp"
+
+# Desired version
+required_version="13"
+
+sudo apt update
+
+# Enable universe repository and update package lists
+echo "Enabling universe repository..."
+sudo add-apt-repository universe -y
+
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+sudo apt update
+
+# Update the system and install dependencies
+echo "Updating system and installing dependencies..."
+sudo apt update -y
+
+# List of required packages
+packages=(
+    bzip2
+    software-properties-common
+    git
+    make
+    autoconf
+    cmake
+    libgl1-mesa-dev
+    libboost-all-dev
+    zlib1g-dev
+    wget
+    xvfb
+    flex
+    bison
+    libxcursor-dev
+    libxcomposite-dev
+    build-essential
+    libssl-dev
+    libxcb1-dev
+    libx11-dev
+    libudev-dev
+    libsdl2-dev
+    qtbase5-private-dev
+    qtdeclarative5-dev
+    libstorm-dev
+    freeglut3-dev
+    libbz2-dev
+    qtbase5-dev
+    libqt5svg5-dev
+    qtmultimedia5-dev
+    libstdc++-13-dev
+    libqt5x11extras5-dev
+    qtchooser
+    qt5-qmake
+    lua5.4
+    liblua5.4-dev
+    gcc-13
+    g++-13
+)
+
+# Install packages
+echo "Installing packages..."
+for package in "${packages[@]}"; do
+    echo "Installing $package..."
+    if sudo apt install -y "$package"; then
+        echo "$package installed successfully."
+    fi
+done
+
+# Clone and install StormLib
+echo "Cloning and installing StormLib..."
+if git clone https://github.com/ladislav-zezula/StormLib.git; then
+    cd StormLib
+    cmake .
+    make -j"$(nproc)"
+    sudo make install
+    cd ..
+fi
+
+# Clone and install LuaJIT
+echo "Cloning and installing LuaJIT..."
+if git clone https://github.com/LuaJIT/LuaJIT.git; then
+    cd LuaJIT
+    make -j"$(nproc)"
+    sudo make install
+    cd ..
+fi
+
+# Function to update alternatives
+update_compiler() {
+    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 100
+    sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 100
+    sudo update-alternatives --set gcc /usr/bin/gcc-13
+    sudo update-alternatives --set g++ /usr/bin/g++-13
+}
+
+# Check if the versions are already correct
+if [[ "$current_gcc" == "$required_version" && "$current_gpp" == "$required_version" ]]; then
+    echo "GCC and G++ are already set to version $required_version."
+else
+    echo "Updating GCC and G++ to version $required_version..."
+    update_compiler
+    echo "GCC and G++ have been updated to version $required_version."
+fi
+
+# Verify changes
+echo "New GCC version: $(gcc -dumpversion)"
+echo "New G++ version: $(g++ -dumpversion)"
 ```
+> [!NOTE]
+> Working Directory: `Linux-Build/`
 
-Compile and build using:
-
-```bash
-mkdir build
-cd build
-cmake ..
+**Clone the repository:**
+```MultiLine
+git clone https://github.com/devkittencpp/noggit-red.git
+```
+﻿
+**Get submodules:**
+```MultiLine
+cd noggit-red
+git submodule update --init --recursive --remote
+```
+﻿
+**Configure and build:**
+```MultiLine
+cd .. && rm -rf build && mkdir build && cd build
+cmake ../noggit-red
 make -j $(nproc)
 ```
 
-Instead of `make -j $(nproc)` you may want to pick a bigger number than
-`$(nproc)`, e.g. the number of `CPU cores * 1.5`.
-
 If the build pass correctly without errors, you can go into build/bin/
-and run noggit. Note that `make install` will probably work but is not
-tested, and nobody has built distributable packages in years.
 
 # SUBMODULES #
 
 To pull the latest version of submodules use the following command at the root directory.
 
 ```bash
-git submodule update --recursive --remote
+git submodule update --init --recursive --remote
 ```
 
 # CODING GUIDELINES #
