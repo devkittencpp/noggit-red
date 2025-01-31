@@ -1,12 +1,12 @@
 [submodule "src/external/blizzard-database-library"]
 	path = src/external/blizzard-database-library
-	url = https://gitlab.com/T1ti/blizzard-database-library.git
+	url = https://github.com/devkittencpp/Blizzard-Database-Library.git
 [submodule "src/external/blizzard-archive-library"]
 	path = src/external/blizzard-archive-library
-	url = https://gitlab.com/T1ti/blizzard-archive-library.git
+	url = https://github.com/devkittencpp/Blizzard-Archive-Library.git
 [submodule "cmake"]
 	path = cmake
-	url = https://gitlab.com/T1ti/build-dependencies.git
+	url = https://github.com/devkittencpp/Build-Dependencies.git
 	branch = dep-cmake
 [submodule "dist/listfile"]
 	path = dist/listfile
