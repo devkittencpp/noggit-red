@@ -4023,6 +4023,7 @@ void MapView::mousePressEvent(QMouseEvent* event)
 
   if (rightMouse)
   {
+    setContextMenuPolicy(Qt::PreventContextMenu);
     _right_click_pos = event->pos();
     look = true;
   }
