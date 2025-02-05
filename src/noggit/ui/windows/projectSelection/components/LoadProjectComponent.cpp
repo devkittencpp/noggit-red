@@ -104,6 +104,12 @@ namespace Noggit::Ui::Component
         QString filepath = it.next();
         QString remainder = q_project_path.relativeFilePath(filepath);
 
+        // Skip "extraData" folder
+        if (remainder.startsWith("extraData/") || remainder == "extraData")
+        {
+          continue;
+        }
+
         if (!remainder.isLower())
         {
           has_uppercase = true;
@@ -138,6 +144,13 @@ namespace Noggit::Ui::Component
           while (it.hasNext())
           {
             QString filepath = it.next();
+
+            // Skip "extraData" folder
+            if (filepath.startsWith("extraData/") || filepath == "extraData")
+            {
+              continue;
+            }
+
             if (!filepath.isLower())
             {
               incorrect_paths.push_back(filepath);
