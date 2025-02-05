@@ -130,6 +130,8 @@ namespace Noggit::Project
     void saveObjectPalette(const NoggitProjectObjectPalette& new_object_palette);
 
     void saveObjectSelectionGroups(const NoggitProjectSelectionGroups& new_selection_groups);
+
+    void updateGlobalCfg(const std::string& _key, int _scale, float _HeightOffset, float _HeightScale);
   };
 
   class ApplicationProject

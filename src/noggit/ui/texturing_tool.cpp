@@ -3,6 +3,7 @@
 #include <noggit/application/Configuration/NoggitApplicationConfiguration.hpp>
 #include <noggit/application/NoggitApplication.hpp>
 #include <noggit/MapView.h>
+#include <noggit/project/ApplicationProject.h>
 #include <noggit/project/CurrentProject.hpp>
 #include <noggit/TabletManager.hpp>
 #include <noggit/TextureManager.h>
@@ -250,29 +251,29 @@ namespace Noggit
           heightmapping_heightscale_spin->setSingleStep(0.1);
           heightmapping_heightscale_spin->setDecimals(3);
           heightmapping_heightscale_spin->setValue(0);
-          heightmapping_group_layout->addRow("Height Scale:", heightmapping_heightscale_spin);
+          heightmapping_group_layout->addRow("Ht Scale:", heightmapping_heightscale_spin);
 
           heightmapping_heightoffset_spin->setRange(-512, 512);
           heightmapping_heightoffset_spin->setSingleStep(0.1);
           heightmapping_heightoffset_spin->setDecimals(3);
           heightmapping_heightoffset_spin->setValue(1);
-          heightmapping_group_layout->addRow("Height Offset:", heightmapping_heightoffset_spin);
+          heightmapping_group_layout->addRow("Ht Offset:", heightmapping_heightoffset_spin);
 
           auto heightmapping_btngroup_layout(new QVBoxLayout(_heightmapping_group));
           auto heightmapping_buttons_widget = new QWidget(_heightmapping_group);
           heightmapping_buttons_widget->setLayout(heightmapping_btngroup_layout);
 
-          auto wrap_label = new QLabel("Note: This doesn't save to .cfg, use copy and do it manually.", _heightmapping_group);
+          auto wrap_label = new QLabel("Note: This updates the tile only if it exists in the file.", _heightmapping_group);
           wrap_label->setWordWrap(true);
           heightmapping_group_layout->addRow(wrap_label);
 
-          _heightmapping_apply_global_btn = new QPushButton("Apply (Global)", this);
-          _heightmapping_apply_global_btn->setFixedHeight(30);
-          heightmapping_btngroup_layout->addWidget(_heightmapping_apply_global_btn);
-
-          _heightmapping_apply_adt_btn = new QPushButton("Apply (Current ADT)", this);
+          _heightmapping_apply_adt_btn = new QPushButton("Apply", this);
           _heightmapping_apply_adt_btn->setFixedHeight(30);
           heightmapping_btngroup_layout->addWidget(_heightmapping_apply_adt_btn);
+
+          _heightmapping_apply_save_btn = new QPushButton("Save to JSON", this);
+          _heightmapping_apply_save_btn->setFixedHeight(30);
+          heightmapping_btngroup_layout->addWidget(_heightmapping_apply_save_btn);
 
           _heightmapping_copy_btn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
           _heightmapping_copy_btn->setFixedHeight(30);
@@ -492,6 +493,42 @@ namespace Noggit
 
               }
           );
+
+          connect(_heightmapping_apply_adt_btn, &QPushButton::pressed, [=]()
+                  {
+                    auto proj = Noggit::Project::CurrentProject::get();
+                    texture_heightmapping_data newData;
+
+                    newData.uvScale = textureHeightmappingData.uvScale;
+                    newData.heightOffset = textureHeightmappingData.uvScale;
+                    newData.heightScale = textureHeightmappingData.heightOffset;
+
+                    Log << "Saving... Apply (Current ADT) - Current texture: " << _current_texture->filename() 
+                        << ", UV Scale: " << textureHeightmappingData.uvScale 
+                        << ", Height Scale: " << textureHeightmappingData.heightScale 
+                        << ", Height Offset: " << textureHeightmappingData.heightOffset << std::endl;
+
+                    proj->ExtraMapData.SetTextureHeightData_Global(_current_texture->filename(), newData); 
+                  });
+
+          connect(_heightmapping_apply_save_btn, &QPushButton::pressed, [=]()
+                  {
+                    auto proj = Noggit::Project::CurrentProject::get();
+
+                    auto foundTexture = proj->ExtraMapData.TextureHeightData_Global.find(_current_texture->filename());
+                    if (foundTexture != proj->ExtraMapData.TextureHeightData_Global.end())
+                    {
+                      proj->updateGlobalCfg(_current_texture->filename(), textureHeightmappingData.uvScale, textureHeightmappingData.heightScale, textureHeightmappingData.heightOffset);
+
+                      QMessageBox::information(nullptr, "Saved", "JSON saved to global.cfg",
+                                               QMessageBox::Ok);
+                    }
+                    else
+                    {
+                      QMessageBox::information(nullptr, "Error", "Texture not found in global.cfg",
+                                               QMessageBox::Ok);
+                    }
+                  });
 
           connect(_heightmapping_copy_btn, &QPushButton::pressed
               , [=]()
@@ -941,9 +978,9 @@ namespace Noggit
 
     }
 
-    QPushButton* const texturing_tool::heightmappingApplyGlobalButton()
+    QPushButton* const texturing_tool::heightmappingApplySaveButton()
     {
-      return _heightmapping_apply_global_btn;
+      return _heightmapping_apply_save_btn;
     }
 
     QPushButton* const texturing_tool::heightmappingApplyAdtButton()

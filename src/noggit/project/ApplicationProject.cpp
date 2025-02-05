@@ -17,6 +17,11 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMessageBox>
+#include <QJsonArray>
+#include <QJsonParseError>
+#include <QIODevice>
+#include <QString>
+
 
 namespace Noggit::Project
 {
@@ -182,6 +187,69 @@ namespace Noggit::Project
             }
         }
     }
+
+    void NoggitProject::updateGlobalCfg(const std::string &_key, int _scale, float _HeightOffset, float _HeightScale)
+    {
+      std::filesystem::path globalCfgPath = std::filesystem::path(this->ProjectPath) / "extraData" / "global.cfg";
+      Log << "Updating global.cfg at " << globalCfgPath << std::endl;
+
+      if (!std::filesystem::exists(globalCfgPath))
+      {
+        Log << "global.cfg does not exist. Skipping update." << std::endl;
+        return;
+      }
+
+      QFile file(QString::fromStdString(globalCfgPath.string()));
+      if (!file.open(QIODevice::ReadOnly))
+      {
+        Log << "Could not open global.cfg for reading." << std::endl;
+        return;
+      }
+
+      // Read existing JSON content
+      QJsonParseError parseError;
+      QJsonDocument document = QJsonDocument::fromJson(file.readAll(), &parseError);
+      file.close();
+
+      if (parseError.error != QJsonParseError::NoError || !document.isObject())
+      {
+        Log << "Error parsing global.cfg: " << parseError.errorString().toStdString() << std::endl;
+        return;
+      }
+
+      QJsonObject root = document.object();
+
+      // Check if the key (_key) exists before updating
+      QString keyStr = QString::fromStdString(_key);
+      if (!root.contains(keyStr))
+      {
+        Log << "Key " << _key << " not found in global.cfg. Skipping update." << std::endl;
+        return;
+      }
+
+      // Update values for the existing key
+      QJsonObject textureData = root[keyStr].toObject();
+      textureData["Scale"] = _scale;
+      textureData["HeightOffset"] = QString::number(std::round(_HeightOffset * 10.0f) / 10.0f, 'f', 1);
+      textureData["HeightScale"] = QString::number(std::round(_HeightScale * 10.0f) / 10.0f, 'f', 1);
+
+      // Save the updated object back to root
+      root[keyStr] = textureData;
+
+      if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+      {
+        Log << "Could not open global.cfg for writing." << std::endl;
+        return;
+      }
+
+      file.write(QJsonDocument(root).toJson(QJsonDocument::Indented));
+      file.close();
+
+      Log << "Updated " << _key << " in global.cfg: Scale=" << _scale
+          << ", HeightOffset=" << _HeightOffset
+          << ", HeightScale=" << _HeightScale << std::endl;
+    }
+
     void NoggitExtraMapData::SetTextureHeightData_Global(const std::string& texture, texture_heightmapping_data data, World* worldToUpdate)
     {
         TextureHeightData_Global[texture] = data;

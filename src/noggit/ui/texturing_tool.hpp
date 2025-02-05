@@ -95,7 +95,7 @@ namespace Noggit
       void change_pressure (float change);
       void change_brush_level (float change);
       void set_pressure (float pressure);
-	  void toggle_brush_level_min_max();
+      void toggle_brush_level_min_max();
       void change_spray_size (float change);
       void change_spray_pressure (float change);
 
@@ -124,8 +124,9 @@ namespace Noggit
       QJsonObject toJSON();
       void fromJSON(QJsonObject const& json);
 
-      QPushButton* const heightmappingApplyGlobalButton();
       QPushButton* const heightmappingApplyAdtButton();
+      QPushButton* const heightmappingApplySaveButton();
+
       texture_heightmapping_data& getCurrentHeightMappingSetting();
     signals:
       void texturePaletteToggled();
@@ -180,8 +181,8 @@ namespace Noggit
       texture_swapper* _texture_switcher;
 
       QGroupBox* _heightmapping_group;
-      QPushButton* _heightmapping_apply_global_btn;
       QPushButton* _heightmapping_apply_adt_btn;
+      QPushButton* _heightmapping_apply_save_btn;
 
       GroundEffectsTool* _ground_effect_tool;
 
