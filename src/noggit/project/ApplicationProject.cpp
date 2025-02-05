@@ -170,6 +170,13 @@ namespace Noggit::Project
                     input_file.open(QIODevice::ReadOnly);
                     QJsonParseError err;
                     auto document = QJsonDocument().fromJson(input_file.readAll(), &err);
+
+                    if (err.error != QJsonParseError::NoError)
+                    {
+                      LogError << "Failed to parse extra data file " << entry.path().generic_string() << std::endl;
+                      continue;
+                    }
+
                     auto root = document.object();
                     auto keys = root.keys();
                     if (entry.path().stem() == "global")
