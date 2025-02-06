@@ -104,10 +104,9 @@ namespace Noggit::Ui::Component
         QString filepath = it.next();
         QString remainder = q_project_path.relativeFilePath(filepath);
 
-        // Skip "extraData" folder
-        if (remainder.startsWith("extraData/") || remainder == "extraData")
-        {
-          continue;
+        // Skip folders containing "extraData" in their path
+        if (remainder.contains("extraData", Qt::CaseInsensitive)) {
+            continue;
         }
 
         if (!remainder.isLower())
@@ -145,8 +144,8 @@ namespace Noggit::Ui::Component
           {
             QString filepath = it.next();
 
-            // Skip "extraData" folder
-            if (filepath.startsWith("extraData/") || filepath == "extraData")
+            // Skip any folder that contains "extraData" in its path
+            if (filepath.contains("/extraData/", Qt::CaseInsensitive) || filepath.endsWith("/extraData", Qt::CaseInsensitive) || filepath.startsWith("extraData/", Qt::CaseInsensitive) || filepath == "extraData")
             {
               continue;
             }
@@ -164,7 +163,11 @@ namespace Noggit::Ui::Component
             QFileInfo f_info_path{ path };
             QString filename_lower = f_info_path.fileName().toLower();
             QDir path_dir = f_info_path.dir();
-            QFile::rename(path, path_dir.filePath(filename_lower));
+            // Exclude folders containing "extraData" in their path
+            if (!path_dir.absolutePath().contains("extraData", Qt::CaseInsensitive))
+            {
+              QFile::rename(path, path_dir.filePath(filename_lower));
+            }
           }
 
           break;
