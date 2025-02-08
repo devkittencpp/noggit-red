@@ -490,7 +490,12 @@ namespace Noggit
                       heightmapping_heightscale_spin->setValue(foundTexture->second.heightScale);
                       heightmapping_heightoffset_spin->setValue(foundTexture->second.heightOffset);
                   }
-
+                  else
+                  {
+                      heightmapping_scale_spin->setValue(0);
+                      heightmapping_heightscale_spin->setValue(0);
+                      heightmapping_heightoffset_spin->setValue(1);
+                  }
               }
           );
 
@@ -525,8 +530,8 @@ namespace Noggit
                     }
                     else
                     {
-                      QMessageBox::information(nullptr, "Error", "Texture not found in global.cfg",
-                                               QMessageBox::Ok);
+                      QMessageBox::critical(nullptr, "Error", "Texture not found in global.cfg",
+                                            QMessageBox::Ok);
                     }
                   });
 
