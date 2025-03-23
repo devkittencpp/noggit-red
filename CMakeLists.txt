@@ -13,9 +13,36 @@ SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS 1)
 
-if (UNIX)
-SET(_lua_debug_lib "/usr/lib/x86_64-linux-gnu/liblua5.4.a")
-SET(_lua_release_lib "/usr/lib/x86_64-linux-gnu/liblua5.4.so")
+if(UNIX)
+    # Detect Lua release (shared) library
+    if(EXISTS "/usr/lib/x86_64-linux-gnu/liblua5.4.so")
+        set(_lua_release_lib "/usr/lib/x86_64-linux-gnu/liblua5.4.so")
+    elseif(EXISTS "/usr/lib64/liblua-5.4.so")
+        set(_lua_release_lib "/usr/lib64/liblua-5.4.so")
+    endif()
+
+    # Detect Lua debug (static) library
+    if(EXISTS "/usr/lib/x86_64-linux-gnu/liblua5.4.a")
+        set(_lua_debug_lib "/usr/lib/x86_64-linux-gnu/liblua5.4.a")
+    elseif(EXISTS "/usr/lib64/liblua-5.4.a")
+        set(_lua_debug_lib "/usr/lib64/liblua-5.4.a")
+    endif()
+
+    # Optionally set LUA_INCLUDE_DIR if not already defined
+    if(NOT DEFINED LUA_INCLUDE_DIR)
+        if(EXISTS "/usr/include/lua5.4")
+            set(LUA_INCLUDE_DIR "/usr/include/lua5.4")
+        elseif(EXISTS "/usr/include/lua-5.4")
+            set(LUA_INCLUDE_DIR "/usr/include/lua-5.4")
+        endif()
+    endif()
+
+    # Set LUA_LIBRARY based on build configuration
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(LUA_LIBRARY ${_lua_debug_lib})
+    else()
+        set(LUA_LIBRARY ${_lua_release_lib})
+    endif()
 endif()
 
 #Including cmake dependencies
